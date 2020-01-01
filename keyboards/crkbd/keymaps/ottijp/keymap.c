@@ -155,8 +155,8 @@ void iota_gfx_task_user(void) {
 }
 #endif//SSD1306OLED
 
-static bool cmd_pressed = false;
-static bool option_pressed = false;
+static bool lower_pressed = false;
+static bool raise_pressed = false;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (record->event.pressed) {
@@ -174,41 +174,29 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
     case LOWER:
       if (record->event.pressed) {
+        lower_pressed = true;
         layer_on(_LOWER);
         update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       } else {
         layer_off(_LOWER);
         update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
+        if (lower_pressed) {
+          register_code(KC_LANG2);
+          unregister_code(KC_LANG2);
+        }
       }
       return false;
     case RAISE:
       if (record->event.pressed) {
+        raise_pressed = true;
         layer_on(_RAISE);
         update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       } else {
         layer_off(_RAISE);
         update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
-      }
-      return false;
-    case KC_RALT:
-      if (record->event.pressed) {
-        option_pressed = true;
-      } else {
-        if (option_pressed) {
+        if (raise_pressed) {
           register_code(KC_LANG1);
           unregister_code(KC_LANG1);
-        }
-      }
-      return true;
-    case KC_LGUI:
-      if (record->event.pressed) {
-        cmd_pressed = true;
-        register_code(KC_LGUI);
-      } else {
-        unregister_code(KC_LGUI);
-        if (cmd_pressed) {
-          register_code(KC_LANG2);
-          unregister_code(KC_LANG2);
         }
       }
       return false;
@@ -238,8 +226,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       #endif
       break;
     default:
-      cmd_pressed = false;
-      option_pressed = false;
+      lower_pressed = false;
+      raise_pressed = false;
   }
   return true;
 }

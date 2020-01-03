@@ -226,8 +226,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       #endif
       break;
     default:
-      lower_pressed = false;
-      raise_pressed = false;
+      if (record->event.pressed) {
+        lower_pressed = false;
+        raise_pressed = false;
+      }
   }
   return true;
 }
